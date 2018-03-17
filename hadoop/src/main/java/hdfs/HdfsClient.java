@@ -2,7 +2,10 @@ package hdfs;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.*;
+import org.apache.hadoop.io.IOUtils;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 /**
@@ -17,7 +20,7 @@ public class HdfsClient {
     参数优先级： 1、客户端代码中设置的值 2、classpath下的用户自定义配置文件 3、服务器的默认配置（jar包底下自带的xml）
      */
     public static void main(String[] args) throws IOException, InterruptedException {
-        listFile2();
+        catFile();
     }
 
     public static void uploadFile() throws IOException {
@@ -57,6 +60,29 @@ public class HdfsClient {
     public static void downloadFile2() throws IOException {
         Configuration configuration = new Configuration();
         FileSystem fileSystem = FileSystem.get(configuration);
+        //先获取一个文件的输入流----针对hdfs上的
+        FSDataInputStream in = fileSystem.open(new Path("E:\\IdeaProjects\\git\\BigData\\hadoop\\src\\main\\java\\hdfs\\testHdfs\\test"));
+        //再构造一个文件的输出流----针对本地的
+        FileOutputStream out = new FileOutputStream(new File("E:\\IdeaProjects\\git\\BigData\\hadoop\\src\\main\\java\\hdfs\\testDownload"));
+        //再将输入流中数据传输到输出流
+        //第三个参数是缓冲区大小
+        IOUtils.copyBytes(in, out, 4096);
+        fileSystem.close();
+    }
+
+    public static void downloadFile3() throws IOException {
+        Configuration configuration = new Configuration();
+        FileSystem fileSystem = FileSystem.get(configuration);
+        //先获取一个文件的输入流----针对hdfs上的
+        FSDataInputStream in = fileSystem.open(new Path("E:\\IdeaProjects\\git\\BigData\\hadoop\\src\\main\\java\\hdfs\\testHdfs\\test"));
+
+        //自定义起始偏移量
+        in.seek(2);
+        //再构造一个文件的输出流----针对本地的
+        FileOutputStream out = new FileOutputStream(new File("E:\\IdeaProjects\\git\\BigData\\hadoop\\src\\main\\java\\hdfs\\testDownload"));
+        //再将输入流中数据传输到输出流
+        // TODO: 2018/03/17 第三个参数的含义？？
+        IOUtils.copyBytes(in, out, 4096);
         fileSystem.close();
     }
 
@@ -131,6 +157,15 @@ public class HdfsClient {
         FileSystem fileSystem = FileSystem.get(configuration);
         // 删除文件夹 ，如果是非空文件夹，参数2必须给值true
         fileSystem.delete(new Path("E:\\IdeaProjects\\git\\BigData\\hadoop\\src\\main\\java\\hdfs\\testHdfs\\test1"),true);
+        fileSystem.close();
+    }
+
+    //读取文件内容
+    public static void catFile() throws IOException{
+        Configuration configuration = new Configuration();
+        FileSystem fileSystem = FileSystem.get(configuration);
+        FSDataInputStream in = fileSystem.open(new Path("E:\\IdeaProjects\\git\\BigData\\hadoop\\src\\main\\java\\hdfs\\testHdfs\\test"));
+        IOUtils.copyBytes(in, System.out, 1024);
         fileSystem.close();
     }
 }
