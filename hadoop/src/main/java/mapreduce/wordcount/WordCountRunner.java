@@ -29,9 +29,9 @@ public class WordCountRunner {
         job.setOutputValueClass(IntWritable.class);
 
         //指定要处理的数据所在的位置
-        FileInputFormat.setInputPaths(job,new Path("E:\\IdeaProjects\\git\\BigData\\hadoop\\src\\main\\java\\mapreduce\\wordcount\\input\\test"));
+        FileInputFormat.setInputPaths(job,new Path("/home/user/IdeaProjects/github/BigData/hadoop/src/main/java/mapreduce/wordcount/input/test"));
         //指定处理完成之后的结果所保存的位置
-        FileOutputFormat.setOutputPath(job,new Path("E:\\IdeaProjects\\git\\BigData\\hadoop\\src\\main\\java\\mapreduce\\wordcount\\output"));
+        FileOutputFormat.setOutputPath(job,new Path("/home/user/IdeaProjects/github/BigData/hadoop/src/main/java/mapreduce/wordcount/output"));
 
         //向yarn集群提交这个job
         boolean res = job.waitForCompletion(true);
