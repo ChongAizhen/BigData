@@ -14,6 +14,7 @@ import java.io.IOException;
 1.combiner是在每一个maptask所在的节点运行，Reducer是接收全局所有Mapper的输出结果；
 2.combiner的意义就是对每一个maptask的输出进行局部汇总，以减小网络传输量
 3.combiner能够应用的前提是不能影响最终的业务逻辑，而且，combiner的输出kv应该跟reducer的输入kv类型要对应起来
+（影响逻辑的例如求平均值：combine阶段（1+3）/2=2，（2+3+4）/3=3，reduce阶段（2+3）/2=2.5，而实际结果为（1+3+2+3+4）/5=2.6）
 
 以wordcount为例，假如maptask中的结果为<(hello,1),(hello,1),(hadoop,1)>，那么传递到reduce时的结果就会变成<(hello,2),(hadoop,1)>
 
