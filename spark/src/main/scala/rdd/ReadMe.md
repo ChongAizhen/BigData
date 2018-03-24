@@ -21,3 +21,7 @@ RDD和它依赖的父RDD（s）的关系有两种不同的类型，即窄依赖�
 窄依赖指的是每一个父RDD的Partition最多被子RDD的一个Partition使用
 
 宽依赖指的是多个子RDD的Partition会依赖同一个父RDD的Partition
+
+## 5. DAG的生成
+
+DAG(Directed Acyclic Graph)叫做有向无环图，原始的RDD通过一系列的转换就就形成了DAG，根据RDD之间的依赖关系的不同将DAG划分成不同的Stage，对于窄依赖，partition的转换处理在Stage中完成计算。对于宽依赖，由于有Shuffle的存在，只能在parent RDD处理完成后，才能开始接下来的计算，因此宽依赖是划分Stage的依据。
