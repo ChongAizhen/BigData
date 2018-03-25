@@ -25,3 +25,9 @@ RDD和它依赖的父RDD（s）的关系有两种不同的类型，即窄依赖�
 ## 5. DAG的生成
 
 DAG(Directed Acyclic Graph)叫做有向无环图，原始的RDD通过一系列的转换就就形成了DAG，根据RDD之间的依赖关系的不同将DAG划分成不同的Stage，对于窄依赖，partition的转换处理在Stage中完成计算。对于宽依赖，由于有Shuffle的存在，只能在parent RDD处理完成后，才能开始接下来的计算，因此宽依赖是划分Stage的依据。
+
+## 6. catch和checkpoint
+cache和checkpoint是有显著区别的，缓存把RDD计算出来然后放在内存中，但是RDD的依赖链不能丢掉，当某个点某个executor宕了，上面cache的RDD就会丢掉，需要通过依赖链重放计算出来，不同的是，checkpoint是把RDD保存在文件，所以依赖链就可以丢掉了，就斩断了依赖链，是通过复制实现的高容错。
+
+推荐方式：rdd1.cache，然后再rdd1.checkpoint
+因为checkpoint是需要把 job 重新从头算一遍， 最好先cache一下， checkpoint就可以直接保存缓存中的 RDD 了， 就不需要重头计算一遍了， 对性能有极大的提升。
