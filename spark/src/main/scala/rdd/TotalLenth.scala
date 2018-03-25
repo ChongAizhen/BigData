@@ -30,6 +30,6 @@ object TotalLenth {
     val sc = new SparkContext(conf);
     val rdd1=sc.textFile("E:\\IdeaProjects\\git\\BigData\\data\\input\\test1").map(_.length).reduce(_+_)
     println(rdd1)
-
+    sc.stop()
   }
 }

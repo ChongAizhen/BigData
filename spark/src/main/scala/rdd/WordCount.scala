@@ -24,5 +24,6 @@ object WordCount {
       //按照第二个值的大小降序排序
       .sortBy(_._2,false)
       .saveAsTextFile("E:\\IdeaProjects\\git\\BigData\\data\\output")
+    sc.stop()
   }
 }

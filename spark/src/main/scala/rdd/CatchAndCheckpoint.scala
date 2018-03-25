@@ -11,7 +11,7 @@ object CatchAndCheckpoint {
     val sc = new SparkContext(conf);
     val rdd = sc.textFile("").flatMap(_.split(" ")).map((_,1)).reduceByKey(_+_).sortByKey()
     rdd.cache()
-    sc.setCheckpointDir("")
+    sc.setCheckpointDir("checkpoint存放的目录")
     rdd.checkpoint()
     rdd.collect()
     rdd.saveAsTextFile("")
