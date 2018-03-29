@@ -18,5 +18,7 @@ object CogroupAndGroupByKey {
     rdd4.collect.foreach(println)
     val rdd5 = (rdd1 union rdd2).groupByKey()
     rdd5.collect.foreach(println)
+
+    sc.stop()
   }
 }

@@ -18,5 +18,7 @@ object UnionAndIntersection {
     //去重
     rdd3.distinct.collect.foreach(println)
     rdd4.collect.foreach(println)
+
+    sc.stop()
   }
 }
