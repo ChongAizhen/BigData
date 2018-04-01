@@ -14,14 +14,14 @@ object MobileLocation {
     println(rdd1.partitions.length)
 
 
-    val rdd2 = rdd1.flatMap(a => {
+    val rdd2 = rdd1.map(a => {
       val arr = a.split(",")
-      if(arr(3).equals("1")){
-        val rdd = (arr(0)+"_"+arr(2),arr(1))
+      val rdd3 = if(arr(3).equals("1")){
+        (arr(0)+"_"+arr(2),arr(1))
       }else{
-        val rdd = (arr(0)+"_"+arr(2),arr(1))
+        (arr(0)+"_"+arr(2),arr(1))
       }
-      a
+      rdd3
     })
 
     sc.stop()
