@@ -1,21 +1,22 @@
-package mapreduce.FileFormat.CombineFileInputFormat;
+package mapreduce.FileFormat.Compression;
+
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapreduce.*;
-import org.apache.hadoop.mapreduce.lib.input.CombineTextInputFormat;
+import org.apache.hadoop.io.compress.CompressionCodec;
+import org.apache.hadoop.io.compress.GzipCodec;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
 import java.io.IOException;
 
-/**
- * Created by chongaizhen on 2018/03/12.
- */
-public class WordCountRunner {
+public class Compression {
 
     static class WordCountMapper extends Mapper<LongWritable,Text,Text,IntWritable> {
 
@@ -23,6 +24,7 @@ public class WordCountRunner {
         //每读取一行调用一次map方法
         @Override
         protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
+            System.out.println("11111111111111111");
             String[] words = value.toString().split(" ");
             for (int i=0;i<words.length;i++){
                 context.write(new Text(words[i]),new IntWritable(1));
@@ -45,9 +47,15 @@ public class WordCountRunner {
 
     public static void main(String[] args) throws Exception {
         Configuration configuration = new Configuration();
+
+        //设置map端输出压缩，但是reduce端看不到输出，把reduce数目设为0只跑map的话结果正常
+        configuration.setBoolean(Job.MAP_OUTPUT_COMPRESS, true);
+        configuration.setClass(Job.MAP_OUTPUT_COMPRESS_CODEC, GzipCodec.class, CompressionCodec.class);
+
+
         Job job = Job.getInstance(configuration);
 
-        job.setJarByClass(WordCountRunner.class);
+        job.setJarByClass(Compression.class);
         job.setMapperClass(WordCountMapper.class);
         job.setReducerClass(WordCountReducer.class);
 
@@ -58,17 +66,18 @@ public class WordCountRunner {
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(IntWritable.class);
 
+        job.setNumReduceTasks(0);
+
         //如果不设置InputFormat，它默认用的是TextInputformat.class
         //计算切片大小的逻辑：Math.max(minSize, Math.min(maxSize, blockSize))
 
-        //小文件的处理方法（小文件数量过多会导致map数目过多）：
-        //采用CombineFileInputFormat，小文件会进行合并切片的大小会尽量满足最小值，但绝对不会超过最大值
-        job.setInputFormatClass(CombineTextInputFormat.class);
-        CombineTextInputFormat.setMaxInputSplitSize(job, 4194304);
-        CombineTextInputFormat.setMinInputSplitSize(job, 2097152);
+        //设置reduce端输出文件的压缩
+        FileOutputFormat.setCompressOutput(job, true);
+        FileOutputFormat.setOutputCompressorClass(job, GzipCodec.class);
 
         //指定要处理的数据所在的位置
-        FileInputFormat.setInputPaths(job,new Path("file:/home/user/IdeaProjects/github/BigData/data/input"));
+        //Hadoop自带的InputFormat类内置支持压缩文件的读取
+        FileInputFormat.setInputPaths(job,new Path("file:/home/user/IdeaProjects/github/BigData/data/input/compress.gz"));
         //指定处理完成之后的结果所保存的位置
         FileOutputFormat.setOutputPath(job,new Path("file:/home/user/IdeaProjects/github/BigData/data/output"));
 
@@ -77,4 +86,5 @@ public class WordCountRunner {
         boolean res = job.waitForCompletion(true);
         System.exit(res?0:1);
     }
+
 }
