@@ -24,7 +24,6 @@ public class Compression {
         //每读取一行调用一次map方法
         @Override
         protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
-            System.out.println("11111111111111111");
             String[] words = value.toString().split(" ");
             for (int i=0;i<words.length;i++){
                 context.write(new Text(words[i]),new IntWritable(1));
@@ -48,9 +47,11 @@ public class Compression {
     public static void main(String[] args) throws Exception {
         Configuration configuration = new Configuration();
 
-        //设置map端输出压缩，但是reduce端看不到输出，把reduce数目设为0只跑map的话结果正常
-        configuration.setBoolean(Job.MAP_OUTPUT_COMPRESS, true);
-        configuration.setClass(Job.MAP_OUTPUT_COMPRESS_CODEC, GzipCodec.class, CompressionCodec.class);
+        //验证结果是mapred.compress.map.out为true以及设置了FileOutputFormat，map和reduce端的输出都会进行压缩
+        configuration.setBoolean("mapred.compress.map.out", true);
+
+//        configuration.setBoolean(Job.MAP_OUTPUT_COMPRESS, true);
+//        configuration.setClass(Job.MAP_OUTPUT_COMPRESS_CODEC, GzipCodec.class, CompressionCodec.class);
 
 
         Job job = Job.getInstance(configuration);
@@ -66,12 +67,10 @@ public class Compression {
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(IntWritable.class);
 
-        job.setNumReduceTasks(0);
-
         //如果不设置InputFormat，它默认用的是TextInputformat.class
         //计算切片大小的逻辑：Math.max(minSize, Math.min(maxSize, blockSize))
 
-        //设置reduce端输出文件的压缩
+        //设置输出文件的压缩
         FileOutputFormat.setCompressOutput(job, true);
         FileOutputFormat.setOutputCompressorClass(job, GzipCodec.class);
 
