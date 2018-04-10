@@ -10,7 +10,9 @@ import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.mapreduce.lib.output.LazyOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.MultipleOutputs;
+import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 
 import java.io.IOException;
 
@@ -88,6 +90,13 @@ public class WordCount {
         //设置我们的业务逻辑Reducer类的输出key和value的数据类型
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(IntWritable.class);
+
+        LazyOutputFormat.setOutputFormatClass(job, TextOutputFormat.class);
+        /*
+        在输出结果中还有两个以part开头的文件，里面什么内容也没有，原因是他们都是程序的默认输出文件，而我们自定义的输出格式不能以part开头
+        解决方法在main函数中加入LazyOutputFormat.setOutputFormatClass(job, TextOutputFormat.class);并注释掉job.setOutputFormatClass(TextOutputFormat.class);
+         */
+//        job.setOutputFormatClass(TextOutputFormat.class);
 
         //指定要处理的数据所在的位置
         FileInputFormat.setInputPaths(job,new Path("E:\\IdeaProjects\\git\\BigData\\data\\input\\test1"));
