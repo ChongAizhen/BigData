@@ -25,7 +25,7 @@ import java.io.IOException;
 但是由于旧版本的MultipleOutputFormat是基于行的划分而MultipleOutputs是基于列的划分。所以在新的API中就剩下了MultipleOutputs(mapreduce包中)类，
 这个类合并了旧API中的MultipleOutputFormat和MultipleOutputs的功能，同时新版的类库中已经不存在MultipleOutputFormat类了
  */
-public class WordCount {
+public class MultipleOutpus {
 
     static class WordCountMapper extends Mapper<LongWritable,Text,Text,IntWritable> {
 
@@ -78,7 +78,7 @@ public class WordCount {
         Configuration configuration = new Configuration();
         Job job = Job.getInstance(configuration);
 
-        job.setJarByClass(WordCount.class);
+        job.setJarByClass(MultipleOutpus.class);
         job.setMapperClass(WordCountMapper.class);
         job.setReducerClass(WordCountReducer.class);
 
@@ -91,11 +91,11 @@ public class WordCount {
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(IntWritable.class);
 
-        LazyOutputFormat.setOutputFormatClass(job, TextOutputFormat.class);
         /*
         在输出结果中还有两个以part开头的文件，里面什么内容也没有，原因是他们都是程序的默认输出文件，而我们自定义的输出格式不能以part开头
         解决方法在main函数中加入LazyOutputFormat.setOutputFormatClass(job, TextOutputFormat.class);并注释掉job.setOutputFormatClass(TextOutputFormat.class);
          */
+        LazyOutputFormat.setOutputFormatClass(job, TextOutputFormat.class);
 //        job.setOutputFormatClass(TextOutputFormat.class);
 
         //指定要处理的数据所在的位置
